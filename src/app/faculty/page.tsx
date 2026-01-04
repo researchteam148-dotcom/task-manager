@@ -83,42 +83,105 @@ export default function FacultyDashboard() {
     };
 
     const statCards = [
-        { label: 'Total Tasks', value: stats.total, color: 'text-blue-600', bgColor: 'bg-blue-50', icon: '📊' },
-        { label: 'Pending', value: stats.pending, color: 'text-yellow-600', bgColor: 'bg-yellow-50', icon: '⏳' },
-        { label: 'Active Subs', value: mySubstitutions.length, color: 'text-purple-600', bgColor: 'bg-purple-50', icon: '🔄' }, // New stat
-        { label: 'Completed', value: stats.completed, color: 'text-green-600', bgColor: 'bg-green-50', icon: '✅' },
-        { label: 'High Priority', value: stats.highPriority, color: 'text-red-600', bgColor: 'bg-red-50', icon: '🔥' },
-        { label: 'Overdue', value: stats.overdue, color: 'text-red-600', bgColor: 'bg-red-50', icon: '⚠️' },
+        {
+            label: 'Total Tasks',
+            value: stats.total,
+            color: 'text-blue-600',
+            bgColor: 'bg-blue-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            )
+        },
+        {
+            label: 'Pending',
+            value: stats.pending,
+            color: 'text-amber-600',
+            bgColor: 'bg-amber-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            )
+        },
+        {
+            label: 'Active Subs',
+            value: mySubstitutions.length,
+            color: 'text-purple-600',
+            bgColor: 'bg-purple-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            )
+        },
+        {
+            label: 'Completed',
+            value: stats.completed,
+            color: 'text-emerald-600',
+            bgColor: 'bg-emerald-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            )
+        },
+        {
+            label: 'High Priority',
+            value: stats.highPriority,
+            color: 'text-rose-600',
+            bgColor: 'bg-rose-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            )
+        },
+        {
+            label: 'Overdue',
+            value: stats.overdue,
+            color: 'text-red-700',
+            bgColor: 'bg-red-50',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            )
+        },
     ];
 
     return (
         <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Faculty Dashboard</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage your routine and assigned tasks</p>
+                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Faculty Dashboard</h1>
+                    <p className="text-sm text-gray-500 font-medium mt-1">Manage your routine and tasks</p>
                 </div>
                 {user && (
-                    <Badge variant="purple" className="px-3 py-1 bg-white shadow-sm border-primary-100 text-primary-700 font-medium">
-                        📍 {user.department} Department
+                    <Badge variant="purple" className="px-3 py-1 bg-white shadow-sm border-primary-100 text-primary-700 font-bold text-[10px] sm:text-xs">
+                        <span className="mr-1">📍</span> {user.department}
                     </Badge>
                 )}
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {statCards.map((stat) => (
-                    <Card key={stat.label} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-5">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                                    <p className={`text-2xl font-bold mt-1 ${stat.color}`}>
+                    <Card key={stat.label} className="overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 group">
+                        <div className={`absolute top-0 left-0 w-1 h-full ${stat.bgColor.replace('bg-', 'bg-')}`}></div>
+                        <CardContent className="p-4 sm:p-5">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.bgColor} ${stat.color} rounded-xl flex items-center justify-center transition-transform group-hover:scale-110`}>
+                                    {stat.icon}
+                                </div>
+                                <div className="text-sm sm:text-right">
+                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">
+                                        {stat.label}
+                                    </p>
+                                    <p className={`text-xl sm:text-2xl font-black ${stat.color} leading-none`}>
                                         {stat.value}
                                     </p>
-                                </div>
-                                <div className={`w-10 h-10 ${stat.bgColor} rounded-full flex items-center justify-center`}>
-                                    <span className="text-xl">{stat.icon}</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -164,8 +227,8 @@ export default function FacultyDashboard() {
 
                     {/* Upcoming Deadlines */}
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Priority Tasks</CardTitle>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-lg font-black text-gray-800">Priority Tasks</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {tasks.length === 0 ? (

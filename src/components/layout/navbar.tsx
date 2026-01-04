@@ -32,24 +32,29 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={onMenuClickAction}
-                            className="p-2 hover:bg-gray-100 rounded-lg lg:hidden transition-colors"
+                            className="p-2 hover:bg-gray-100 rounded-xl lg:hidden transition-all active:scale-95"
                             aria-label="Toggle menu"
                         >
-                            <span className="text-2xl leading-none">☰</span>
+                            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                            </svg>
                         </button>
 
-                        <div className="flex items-center gap-3">
-                            <span className="text-2xl hidden sm:block">📝</span>
-                            <h1 className="text-xl font-bold text-gray-900 tracking-tight hidden xs:block">Task Planner</h1>
-                            <Badge variant={user.role === 'admin' ? 'default' : 'purple'} className="hidden sm:inline-flex">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg shadow-primary-200">
+                                <span className="text-white text-lg font-bold">T</span>
+                            </div>
+                            <h1 className="text-lg font-black text-gray-900 tracking-tighter hidden xs:block">TaskFlow</h1>
+                            <Badge variant={user.role === 'admin' ? 'default' : 'purple'} className="hidden xs:inline-flex text-[10px] px-2 py-0">
                                 {user.role.toUpperCase()}
                             </Badge>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex items-center gap-1 sm:gap-4">
                         <NotificationCenter />
-                        <div className="h-4 w-px bg-gray-200 mx-1 hidden sm:block"></div>
+
+                        <div className="h-4 w-px bg-gray-200 mx-1 hidden xs:block"></div>
 
                         <div className="hidden md:flex flex-col items-end">
                             <p className="text-sm font-bold text-gray-900 leading-none mb-1">{user.name}</p>
@@ -60,10 +65,12 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
                             variant="ghost"
                             size="sm"
                             onClick={handleSignOut}
-                            className="text-gray-500 hover:text-red-600 hover:bg-red-50 text-xs sm:text-sm px-2 sm:px-4"
+                            className="text-gray-500 hover:text-red-600 hover:bg-red-50 p-2 sm:px-4 rounded-xl transition-all"
                         >
-                            <span className="sm:hidden">Logout</span>
-                            <span className="hidden sm:inline">Sign Out</span>
+                            <svg className="w-5 h-5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span className="hidden sm:inline font-semibold">Sign Out</span>
                         </Button>
                     </div>
                 </div>
