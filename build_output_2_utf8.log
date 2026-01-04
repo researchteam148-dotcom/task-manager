@@ -1,0 +1,69 @@
+﻿
+> task-manager@1.0.0 build
+> next build
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+
+  Creating an optimized production build ...
+npm : Error: Cannot apply unknown utility class `border-border`
+At line:1 char:1
++ npm run build > build_output_2.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error: Cannot a...`border-border`:Str 
+   ing) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    [2m[at onInvalidCandidate (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:21:1511)][0m
+    [2m[at Te (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:16:36652)][0m
+    [2m[at D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:21:355][0m
+    [2m[at Rr (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:3:1718)][0m
+    [2m[at _ (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:3:1377)][0m
+    [2m[at $e (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:21:172)][0m
+    [2m[at un (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:38:294)][0m
+    [2m[at async cn (D:\BTECH 
+projects\Task-manager\node_modules\tailwindcss\dist\lib.js:38:631)][0m
+    [2m[at async Xr (D:\BTECH 
+projects\Task-manager\node_modules\@tailwindcss\node\dist\index.js:10:3417)][0m
+    [2m[at async I (D:\BTECH 
+projects\Task-manager\node_modules\@tailwindcss\postcss\dist\index.js:10:3977)][0m
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: D:\BTECH 
+projects\Task-manager\src\app\globals.css:1:1: Cannot apply unknown utility class 
+`border-border`
+    at Input.error (node_modules/postcss/lib/input.js:135:16) [D:\BTECH 
+projects\Task-manager\.next\build\chunks\node_modules_fe693df6._.js:4651:22]
+    at Root.error (node_modules/postcss/lib/node.js:146:32) [D:\BTECH 
+projects\Task-manager\.next\build\chunks\node_modules_fe693df6._.js:928:38]
+    [at Object.Once (D:\BTECH 
+projects\Task-manager\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    at async LazyResult.runAsync (node_modules/postcss/lib/lazy-result.js:293:11) 
+[D:\BTECH 
+projects\Task-manager\.next\build\chunks\node_modules_fe693df6._.js:6206:21]
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) 
+[D:\BTECH projects\Task-manager\.next\build\chunks\[root-of-the-server]__6d51cb5d._
+.js:172:36]
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [D:\BTECH pr
+ojects\Task-manager\.next\build\chunks\[root-of-the-server]__44695d76._.js:443:31]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+
+
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) 
+[D:\BTECH projects\Task-manager\.next\build\chunks\[root-of-the-server]__6d51cb5d._
+.js:172:36])
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [D:\BTECH pr
+ojects\Task-manager\.next\build\chunks\[root-of-the-server]__44695d76._.js:443:31])
