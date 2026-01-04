@@ -50,12 +50,20 @@ export function useFCM(user: User | null) {
 
         // Listen for foreground messages
         const unsubscribe = onMessage(messaging, (payload) => {
-            console.log('Foreground message received:', payload);
-            if (payload.notification) {
-                new Notification(payload.notification.title || 'Notification', {
-                    body: payload.notification.body,
-                    icon: '/icons/icon-192x192.png',
+            console.log('🔔 FCM: Foreground message received:', payload);
+
+            // Extract title and body
+            const title = payload.notification?.title || payload.data?.title || 'New TaskFlow Alert';
+            const body = payload.notification?.body || payload.data?.message || 'Check your dashboard for updates.';
+
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '/favicon.ico',
+                    tag: 'taskflow-foreground',
                 });
+            } else {
+                console.log('ℹ️ FCM: Notification received but permission not granted. Message:', body);
             }
         });
 

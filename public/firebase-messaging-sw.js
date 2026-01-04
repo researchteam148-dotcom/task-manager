@@ -14,11 +14,16 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    const notificationTitle = payload.notification.title;
+
+    // Extract title and body from either 'notification' or 'data'
+    const notificationTitle = payload.notification?.title || payload.data?.title || 'New TaskFlow Alert';
     const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/icons/icon-192x192.png', // Add a default icon path if you have one
+        body: payload.notification?.body || payload.data?.message || 'Check your dashboard for updates.',
+        tag: 'taskflow-notification', // Group notifications
+        badge: '/favicon.ico',
+        // Removed broken icon path to prevent silent failures
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    console.log('🔔 [SW] Showing notification:', notificationTitle);
+    return self.registration.showNotification(notificationTitle, notificationOptions);
 });

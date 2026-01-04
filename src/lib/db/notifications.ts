@@ -39,16 +39,18 @@ export async function createNotification(
         const docRef = await addDoc(collection(db, 'notifications'), notificationData);
 
         // 2. Trigger Push Notification (via server or API)
-        // We do this asynchronously so it doesn't block the Firestore write
         const triggerPush = async () => {
+            console.log(`🔔 FCM: Attempting to trigger push for ${userId}...`);
             try {
                 // If on client, call API
                 if (typeof window !== 'undefined') {
                     const { auth } = await import('../firebase-config');
                     const currentUser = auth.currentUser;
+
                     if (currentUser) {
+                        console.log('🔔 FCM: Calling Push API from client.');
                         const idToken = await currentUser.getIdToken();
-                        await fetch('/api/notifications/push', {
+                        const response = await fetch('/api/notifications/push', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -56,15 +58,24 @@ export async function createNotification(
                             },
                             body: JSON.stringify({ userId, title, message }),
                         });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            console.error('❌ FCM: Push API failed:', errorData);
+                        } else {
+                            console.log('✅ FCM: Push API call successful.');
+                        }
+                    } else {
+                        console.warn('⚠️ FCM: Skipping push trigger (No current user for Auth token).');
                     }
                 } else {
                     // If on server, call server utility directly
-                    // This avoids extra network overhead for server-to-server calls
+                    console.log('🔔 FCM: Calling Server Utility directly.');
                     const { sendPushNotification } = await import('../fcm-server');
                     await sendPushNotification(userId, title, message);
                 }
             } catch (err) {
-                console.error('Failed to trigger push notification:', err);
+                console.error('❌ FCM: Failed to trigger push notification:', err);
             }
         };
 

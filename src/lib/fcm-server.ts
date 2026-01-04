@@ -9,10 +9,16 @@ export async function sendPushNotification(
     try {
         // 1. Get user's FCM tokens from Firestore
         const userDoc = await adminDb.collection('users').doc(userId).get();
-        if (!userDoc.exists) return;
+
+        if (!userDoc.exists) {
+            console.warn(`⚠️ FCM: User ${userId} not found in Firestore.`);
+            return;
+        }
 
         const userData = userDoc.data();
         const tokens = userData?.fcmTokens || [];
+
+        console.log(`📡 FCM: Preparing to send push to User ${userId}. Tokens: ${tokens.length}`);
 
         if (tokens.length === 0) {
             console.log(`No FCM tokens found for user ${userId}`);
@@ -57,7 +63,12 @@ export async function sendPushNotification(
         }
 
         return response;
-    } catch (error) {
-        console.error('Error in sendPushNotification:', error);
+    } catch (error: any) {
+        console.error('❌ FCM CRITICAL ERROR in sendPushNotification:', error);
+        console.error('Error Details:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
     }
 }

@@ -6,14 +6,23 @@ import { getMessaging, Messaging } from 'firebase/messaging';
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyC89iI7elL3XpKz4MR0Cr8wzuL9npBRFus",
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "task-manager-5899b.firebaseapp.com",
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "task-manager-5899b",
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "task-manager-5899b.firebasestorage.app",
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "222182929844",
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:222182929844:web:c79ce9a884b98c05be2ee1",
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-EDVTMBQKC6",
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+
+// Debug: Check if env variables are present on client
+if (typeof window !== 'undefined') {
+    console.log('--- Firebase Client Config Check ---');
+    console.log('API Key present:', !!firebaseConfig.apiKey);
+    console.log('Project ID present:', !!firebaseConfig.projectId);
+    console.log('Sender ID present:', !!firebaseConfig.messagingSenderId);
+    console.log('---------------------------------');
+}
 
 // Initialize Firebase (client-side)
 let app: FirebaseApp;

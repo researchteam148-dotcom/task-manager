@@ -14,8 +14,10 @@ export async function POST(req: NextRequest) {
         await adminAuth.verifyIdToken(idToken); // Ensure requester is a valid user
 
         const { userId, title, message } = await req.json();
+        console.log('📡 Push API: Received request for user:', userId);
 
         if (!userId || !title || !message) {
+            console.warn('⚠️ Push API: Missing required fields.');
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error: any) {
-        console.error('Error in Push API:', error);
+        console.error('❌ Push API ERROR:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
