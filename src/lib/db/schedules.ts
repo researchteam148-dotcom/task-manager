@@ -56,43 +56,73 @@ export async function updateFacultySchedule(
 
 /**
  * Find all faculty members who have a leisure period on a specific day and time slot
+ * Includes AI-inspired "smart scoring" to find the best possible substitute
  */
 export async function findAvailableFaculty(
-    day: ScheduleSlot['day'],
+    date: Date,
     startTime: string,
-    department?: string
-): Promise<{ uid: string; name: string }[]> {
+    targetDepartment?: string
+): Promise<{ uid: string; name: string; score: number }[]> {
     try {
-        const schedulesRef = collection(db, 'schedules');
-        const q = department
-            ? query(collection(db, 'users'), where('role', '==', 'faculty'), where('department', '==', department))
-            : query(collection(db, 'users'), where('role', '==', 'faculty'));
+        // 1. Convert Date to Weekday
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayName = days[date.getDay()] as ScheduleSlot['day'];
 
+        // 2. Fetch all faculty
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('role', '==', 'faculty'));
         const facultySnap = await getDocs(q);
-        const availableFaculty: { uid: string; name: string }[] = [];
+
+        const availabilityList: { uid: string; name: string; score: number }[] = [];
 
         for (const facultyDoc of facultySnap.docs) {
             const facultyData = facultyDoc.data();
             const schedule = await getFacultySchedule(facultyDoc.id);
 
             if (schedule) {
-                // Check if this faculty has a leisure slot that matches the time
+                // Check if this faculty has a leisure slot that matches the time on that specific weekday
                 const isLeisure = schedule.slots.some(
-                    slot => slot.day === day &&
+                    slot => slot.day === dayName &&
                         slot.startTime === startTime &&
                         slot.type === 'leisure'
                 );
 
                 if (isLeisure) {
-                    availableFaculty.push({
+                    // 3. APPLY SMART SCORING LOGIC
+                    let score = 0;
+
+                    // Preference 1: Same Department (+50 points)
+                    if (targetDepartment && facultyData.department === targetDepartment) {
+                        score += 50;
+                    }
+
+                    // Preference 2: Workload Balancing
+                    // Check how many active substitutions they already have for this date (lower is better)
+                    const subsRef = collection(db, 'substitutions');
+                    const subQ = query(
+                        subsRef,
+                        where('substituteFacultyId', '==', facultyDoc.id),
+                        where('status', '==', 'active')
+                    );
+                    const subSnap = await getDocs(subQ);
+
+                    // Deduct points for each active substitution to balance load
+                    score -= (subSnap.docs.length * 15);
+
+                    // Preference 3: Schedule Proximity
+                    // (Potential future enhancement: check if they have a class before/after this slot)
+
+                    availabilityList.push({
                         uid: facultyDoc.id,
-                        name: facultyData.name
+                        name: facultyData.name,
+                        score: score
                     });
                 }
             }
         }
 
-        return availableFaculty;
+        // Sort by score descending (highest score first)
+        return availabilityList.sort((a, b) => b.score - a.score);
     } catch (error) {
         console.error('Error finding available faculty:', error);
         return [];

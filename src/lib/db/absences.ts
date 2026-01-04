@@ -46,17 +46,14 @@ export async function reportAbsence(
         const absenceRef = await addDoc(collection(db, 'absences'), absenceData);
 
         // Smart Auto-assignment Logic
-        // 1. Identify day of the week
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const dayName = days[date.getDay()] as ScheduleSlot['day'];
+        // 1. Find the BEST available faculty using Smart Scoring
+        // This now handles Date -> Weekday conversion internally in schedules.ts
+        const substitutes = await findAvailableFaculty(date, startTime, user.department);
 
-        // 2. Find available faculty in the same department
-        const substitutes = await findAvailableFaculty(dayName, startTime, user.department);
-
-        // 3. Auto-assign if someone is available
+        // 2. Auto-assign the highest scoring faculty member
         let substitutionId: string | undefined;
         if (substitutes.length > 0) {
-            const chosenStaff = substitutes[0]; // Simple logic: pick first available
+            const chosenStaff = substitutes[0]; // The list is already sorted by highest score
 
             const subData: Omit<Substitution, 'id'> = {
                 absenceId: absenceRef.id,
@@ -76,12 +73,33 @@ export async function reportAbsence(
             // Update absence record with substitution ID
             await updateDoc(absenceRef, { substitutionId, status: 'approved' });
 
+            // 3. SEND SMART NOTIFICATIONS
+            const { createNotification } = await import('./notifications');
+
+            // Notify the substitute
+            await createNotification(
+                chosenStaff.uid,
+                'system',
+                '⚡ Intelligent Substitution Assigned',
+                `You have been intelligently assigned to substitute for ${user.name} on ${date.toDateString()} at ${startTime}.`,
+                subRef.id
+            );
+
+            // Notify the original faculty
+            await createNotification(
+                facultyUid,
+                'system',
+                '✅ Substitution Arranged',
+                `Your absence on ${date.toDateString()} has been covered. ${chosenStaff.name} will be your substitute.`,
+                absenceRef.id
+            );
+
             // Create audit log
             await createAuditLog({
                 taskId: 'SUBSTITUTION',
                 action: 'Updated',
-                performedBy: 'SYSTEM',
-                details: `Auto-assigned ${chosenStaff.name} to substitute ${user.name} on ${date.toDateString()} at ${startTime}`,
+                performedBy: 'INTELLIGENT_SYSTEM',
+                details: `Smart-assigned ${chosenStaff.name} (Score: ${chosenStaff.score}) to substitute ${user.name} on ${date.toDateString()} at ${startTime}`,
             });
         }
 
