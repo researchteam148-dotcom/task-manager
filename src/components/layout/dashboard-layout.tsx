@@ -4,13 +4,19 @@ import React, { useState } from 'react';
 import { Navbar } from './navbar';
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
+import { useAuth } from '@/contexts/auth-context';
+import { useFCM } from '@/lib/hooks/use-fcm';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+    const { user } = useAuth();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Initialize Web Push Notifications
+    useFCM(user);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">

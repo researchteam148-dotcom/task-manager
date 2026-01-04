@@ -10,6 +10,8 @@ export interface User {
     role: UserRole;
     department: string;
     empId: string;
+    photoURL?: string;
+    bio?: string;
     requiresPasswordChange?: boolean;
     createdAt: Timestamp;
 }

@@ -56,10 +56,22 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
 
                         <div className="h-4 w-px bg-gray-200 mx-1 hidden xs:block"></div>
 
-                        <div className="hidden md:flex flex-col items-end">
-                            <p className="text-sm font-bold text-gray-900 leading-none mb-1">{user.name}</p>
-                            <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{user.department}</p>
-                        </div>
+                        <Link
+                            href="/profile"
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-gray-50 transition-all group"
+                        >
+                            <div className="hidden md:flex flex-col items-end">
+                                <p className="text-sm font-bold text-gray-900 leading-none mb-1 group-hover:text-primary-600 transition-colors">{user.name}</p>
+                                <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{user.department}</p>
+                            </div>
+                            <div className="w-9 h-9 rounded-xl overflow-hidden border border-gray-200 bg-slate-100 flex items-center justify-center shadow-sm group-hover:border-primary-200 transition-all">
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-sm font-black text-slate-400">{user.name.charAt(0)}</span>
+                                )}
+                            </div>
+                        </Link>
 
                         <Button
                             variant="ghost"

@@ -15,6 +15,7 @@ import { Notification, NotificationType } from '@/types';
 
 /**
  * Create a new notification for a specific user
+ * Now triggers a device-level push notification as well
  */
 export async function createNotification(
     userId: string,
@@ -34,7 +35,41 @@ export async function createNotification(
             createdAt: Timestamp.now(),
         };
 
+        // 1. Create Firestore record
         const docRef = await addDoc(collection(db, 'notifications'), notificationData);
+
+        // 2. Trigger Push Notification (via server or API)
+        // We do this asynchronously so it doesn't block the Firestore write
+        const triggerPush = async () => {
+            try {
+                // If on client, call API
+                if (typeof window !== 'undefined') {
+                    const { auth } = await import('../firebase-config');
+                    const currentUser = auth.currentUser;
+                    if (currentUser) {
+                        const idToken = await currentUser.getIdToken();
+                        await fetch('/api/notifications/push', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${idToken}`,
+                            },
+                            body: JSON.stringify({ userId, title, message }),
+                        });
+                    }
+                } else {
+                    // If on server, call server utility directly
+                    // This avoids extra network overhead for server-to-server calls
+                    const { sendPushNotification } = await import('../fcm-server');
+                    await sendPushNotification(userId, title, message);
+                }
+            } catch (err) {
+                console.error('Failed to trigger push notification:', err);
+            }
+        };
+
+        triggerPush();
+
         return docRef.id;
     } catch (error) {
         console.error('Error creating notification:', error);

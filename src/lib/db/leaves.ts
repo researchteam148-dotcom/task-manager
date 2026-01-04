@@ -70,8 +70,7 @@ export function subscribeToPendingLeaves(
 ): Unsubscribe {
     const q = query(
         collection(db, 'leaves'),
-        where('status', '==', 'pending'),
-        orderBy('createdAt', 'desc')
+        where('status', '==', 'pending')
     );
 
     return onSnapshot(

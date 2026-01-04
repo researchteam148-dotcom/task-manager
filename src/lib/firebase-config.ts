@@ -2,6 +2,7 @@ import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
+import { getMessaging, Messaging } from 'firebase/messaging';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const firebaseConfig = {
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
+let messaging: Messaging;
 let analytics: Analytics | undefined;
 
 if (typeof window !== 'undefined') {
@@ -30,6 +32,7 @@ if (typeof window !== 'undefined') {
 
     auth = getAuth(app);
     db = getFirestore(app);
+    messaging = getMessaging(app);
 
     // Initialize Analytics
     isSupported().then(supported => {
@@ -39,4 +42,4 @@ if (typeof window !== 'undefined') {
     });
 }
 
-export { auth, db, analytics };
+export { auth, db, messaging, analytics };

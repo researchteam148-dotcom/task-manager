@@ -22,6 +22,7 @@ export function NavLinks({ onItemClick, className }: NavLinksProps) {
         { href: '/admin/faculty', label: 'Faculty Members', icon: '👥' },
         { href: '/admin/leaves', label: 'Leave Approvals', icon: '📅' },
         { href: '/admin/audit-logs', label: 'Audit Logs', icon: '📜' },
+        { href: '/profile', label: 'My Profile', icon: '👤' },
     ];
 
     const facultyLinks = [
@@ -29,6 +30,7 @@ export function NavLinks({ onItemClick, className }: NavLinksProps) {
         { href: '/faculty/tasks', label: 'My Tasks', icon: '📋' },
         { href: '/faculty/timetable', label: 'Timetable', icon: '🕒' },
         { href: '/faculty/leaves', label: 'Leave Requests', icon: '📅' },
+        { href: '/profile', label: 'My Profile', icon: '👤' },
     ];
 
     const links = user.role === 'admin' ? adminLinks : facultyLinks;
