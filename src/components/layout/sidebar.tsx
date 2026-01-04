@@ -1,57 +1,32 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { NavLinks } from './nav-links';
 import { useAuth } from '@/contexts/auth-context';
-import { cn } from '@/lib/utils';
 
 export function Sidebar() {
     const { user } = useAuth();
-    const pathname = usePathname();
 
     if (!user) return null;
 
-    const adminLinks = [
-        { href: '/admin', label: 'Dashboard', icon: '🏠' },
-        { href: '/admin/tasks', label: 'All Tasks', icon: '📋' },
-        { href: '/admin/faculty', label: 'Faculty Members', icon: '👥' },
-        { href: '/admin/leaves', label: 'Leave Approvals', icon: '📅' },
-        { href: '/admin/audit-logs', label: 'Audit Logs', icon: '📜' },
-    ];
-
-    const facultyLinks = [
-        { href: '/faculty', label: 'Dashboard', icon: '🏠' },
-        { href: '/faculty/tasks', label: 'My Tasks', icon: '📋' },
-        { href: '/faculty/timetable', label: 'Timetable', icon: '🕒' },
-        { href: '/faculty/leaves', label: 'Leave Requests', icon: '📅' },
-    ];
-
-    const links = user.role === 'admin' ? adminLinks : facultyLinks;
-
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-screen hidden md:block">
+        <aside className="w-72 bg-white border-r border-gray-200 min-h-[calc(100vh-64px)] hidden lg:block sticky top-16">
             <div className="p-6">
-                <nav className="space-y-1">
-                    {links.map((link) => {
-                        const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-4">
+                    Main Navigation
+                </p>
+                <NavLinks />
+            </div>
 
-                        return (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                                    isActive
-                                        ? "bg-primary-50 text-primary-700"
-                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                )}
-                            >
-                                <span className="text-lg">{link.icon}</span>
-                                {link.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
+            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-3 px-4 py-2">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
+                        {user.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs font-bold text-gray-900 truncate">{user.name}</p>
+                        <p className="text-[10px] text-gray-500 truncate capitalize">{user.role}</p>
+                    </div>
+                </div>
             </div>
         </aside>
     );

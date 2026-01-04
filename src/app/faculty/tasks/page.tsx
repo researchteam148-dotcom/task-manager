@@ -65,23 +65,24 @@ export default function FacultyTasksPage() {
     return (
         <div className="space-y-6 animate-fade-in">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-                <p className="text-gray-600 mt-1">View and manage your assigned tasks</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">My Tasks</h1>
+                <p className="text-sm text-gray-500 mt-1">View and manage your assigned tasks</p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
+                    <div className="flex flex-col xl:flex-row gap-4">
+                        <div className="flex-1 w-full">
                             <Input
                                 placeholder="Search tasks..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full"
                             />
                         </div>
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-2 sm:flex gap-2">
                             <select
-                                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-sm"
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
@@ -92,7 +93,7 @@ export default function FacultyTasksPage() {
                             </select>
 
                             <select
-                                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-sm"
                                 value={priorityFilter}
                                 onChange={(e) => setPriorityFilter(e.target.value)}
                             >
@@ -117,26 +118,34 @@ export default function FacultyTasksPage() {
                                 return (
                                     <Link key={task.id} href={`/faculty/tasks/${task.id}`}>
                                         <div
-                                            className={`p-4 border rounded-lg transition-all hover:shadow-md cursor-pointer ${overdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white hover:border-primary-300'
+                                            className={`p-4 border rounded-xl transition-all hover:shadow-md cursor-pointer ${overdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white hover:border-primary-300'
                                                 }`}
                                         >
                                             <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <h3 className="font-semibold text-gray-900">{task.title}</h3>
-                                                        <Badge variant={task.status}>{task.status}</Badge>
-                                                        <Badge variant={task.priority}>{task.priority}</Badge>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                        <h3 className="font-bold text-gray-900 truncate max-w-[180px] sm:max-w-none">{task.title}</h3>
+                                                        <div className="flex gap-1.5 flex-shrink-0">
+                                                            <Badge variant={task.status}>{task.status}</Badge>
+                                                            <Badge variant={task.priority}>{task.priority}</Badge>
+                                                        </div>
                                                         {overdue && (
-                                                            <span className="text-xs font-medium text-red-600">⚠️ Overdue</span>
+                                                            <span className="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full uppercase tracking-wider">⚠️ Overdue</span>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">{task.description}</p>
-                                                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                                        <span>📅 Deadline: <strong>{formatDate(task.deadline)}</strong></span>
-                                                        <span>👨‍💼 Created by: <strong>{task.createdByName}</strong></span>
+                                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                                                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2 text-[11px] text-gray-500">
+                                                        <span className="flex items-center gap-1.5">
+                                                            <span className="text-sm">📅</span>
+                                                            Deadline: <strong className="text-gray-900">{formatDate(task.deadline)}</strong>
+                                                        </span>
+                                                        <span className="flex items-center gap-1.5">
+                                                            <span className="text-sm">👨‍💼</span>
+                                                            Created by: <strong className="text-gray-900">{task.createdByName}</strong>
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <div className="text-primary-600 text-xl">→</div>
+                                                <div className="text-primary-600 text-xl self-center">→</div>
                                             </div>
                                         </div>
                                     </Link>

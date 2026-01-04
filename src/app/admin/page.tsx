@@ -65,13 +65,13 @@ export default function AdminDashboard() {
 
     return (
         <div className="space-y-6 animate-fade-in">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p className="text-gray-600 mt-1">Welcome back, {user?.name}</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+                    <p className="text-sm text-gray-500 mt-1">Welcome back, {user?.name}</p>
                 </div>
-                <Link href="/admin/tasks/create">
-                    <Button variant="primary">➕ Create New Task</Button>
+                <Link href="/admin/tasks/create" className="w-full sm:w-auto">
+                    <Button variant="primary" className="w-full shadow-sm shadow-primary-200">➕ Create New Task</Button>
                 </Link>
             </div>
 

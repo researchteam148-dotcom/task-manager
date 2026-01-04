@@ -13,16 +13,38 @@ export default function AdminLeavesPage() {
     const { user } = useAuth();
     const [pendingLeaves, setPendingLeaves] = useState<LeaveRequest[]>([]);
     const [processedLeaves, setProcessedLeaves] = useState<LeaveRequest[]>([]);
+    const [isPendingLoading, setIsPendingLoading] = useState(true);
+    const [isProcessedLoading, setIsProcessedLoading] = useState(true);
+    const [pendingError, setPendingError] = useState<string | null>(null);
+    const [processedError, setProcessedError] = useState<string | null>(null);
     const [adminComments, setAdminComments] = useState<Record<string, string>>({});
     const [processingId, setProcessingId] = useState<string | null>(null);
 
     useEffect(() => {
-        const unsubscribePending = subscribeToPendingLeaves((data) => {
-            setPendingLeaves(data);
-        });
-        const unsubscribeProcessed = subscribeToProcessedLeaves((data) => {
-            setProcessedLeaves(data);
-        });
+        const unsubscribePending = subscribeToPendingLeaves(
+            (data) => {
+                setPendingLeaves(data);
+                setIsPendingLoading(false);
+                setPendingError(null);
+            },
+            (error) => {
+                setIsPendingLoading(false);
+                setPendingError(error.message.includes('requires an index') ? 'INDEX_MISSING' : error.message);
+            }
+        );
+
+        const unsubscribeProcessed = subscribeToProcessedLeaves(
+            (data) => {
+                setProcessedLeaves(data);
+                setIsProcessedLoading(false);
+                setProcessedError(null);
+            },
+            (error) => {
+                setIsProcessedLoading(false);
+                setProcessedError(error.message.includes('requires an index') ? 'INDEX_MISSING' : error.message);
+            }
+        );
+
         return () => {
             unsubscribePending();
             unsubscribeProcessed();
@@ -57,13 +79,23 @@ export default function AdminLeavesPage() {
                 <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                         <span className="flex items-center gap-2">
-                            <span>⏳</span> Pending Requests
+                            <span>⏳</span> {isPendingLoading ? 'Loading Pending...' : 'Pending Requests'}
                         </span>
-                        <Badge variant="Pending">{pendingLeaves.length}</Badge>
+                        {!isPendingLoading && !pendingError && <Badge variant="Pending">{pendingLeaves.length}</Badge>}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {pendingLeaves.length === 0 ? (
+                    {isPendingLoading ? (
+                        <div className="p-12 flex flex-col items-center justify-center space-y-3">
+                            <div className="animate-spin h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full" />
+                            <p className="text-gray-500">Checking for new requests...</p>
+                        </div>
+                    ) : pendingError === 'INDEX_MISSING' ? (
+                        <div className="p-8 text-center bg-amber-50 rounded-xl border border-amber-200">
+                            <p className="text-amber-800 font-medium">Database expansion required to view pending leaves.</p>
+                            <p className="text-xs text-amber-600 mt-1">Please check the browser console for the setup link.</p>
+                        </div>
+                    ) : pendingLeaves.length === 0 ? (
                         <div className="p-12 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
                             <span className="text-5xl mb-4 block">🏝️</span>
                             <p className="text-gray-500 font-medium">No pending leave requests to review.</p>
@@ -140,13 +172,27 @@ export default function AdminLeavesPage() {
             </Card>
 
             {/* Processed Leaves History */}
-            {processedLeaves.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2 px-2">
-                        <span>📜</span> Processed History
-                    </h2>
-                    <Card>
-                        <CardContent className="p-0 overflow-hidden">
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2 px-2">
+                    <span>📜</span> Processed History
+                </h2>
+                <Card>
+                    <CardContent className="p-0 overflow-hidden">
+                        {isProcessedLoading ? (
+                            <div className="p-10 text-center">
+                                <div className="animate-spin h-6 w-6 border-2 border-primary-500 border-t-transparent rounded-full mx-auto mb-2" />
+                                <p className="text-sm text-gray-400">Loading history...</p>
+                            </div>
+                        ) : processedError === 'INDEX_MISSING' ? (
+                            <div className="p-8 text-center bg-amber-50 rounded-xl m-4 border border-amber-200">
+                                <p className="text-amber-800 font-medium text-sm">Processed history index is being built.</p>
+                                <p className="text-[10px] text-amber-600 mt-1 uppercase font-bold">Check console for link</p>
+                            </div>
+                        ) : processedLeaves.length === 0 ? (
+                            <div className="p-10 text-center text-gray-400 italic">
+                                No processed records found.
+                            </div>
+                        ) : (
                             <div className="divide-y divide-gray-100">
                                 {processedLeaves.map((leave) => (
                                     <div key={leave.id} className="p-5 hover:bg-gray-50/50 transition-colors">
@@ -181,10 +227,10 @@ export default function AdminLeavesPage() {
                                     </div>
                                 ))}
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

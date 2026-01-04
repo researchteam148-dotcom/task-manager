@@ -93,13 +93,13 @@ export default function FacultyDashboard() {
 
     return (
         <div className="space-y-6 animate-fade-in">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Faculty Dashboard</h1>
-                    <p className="text-gray-600 mt-1">Manage your routine and assigned tasks</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Faculty Dashboard</h1>
+                    <p className="text-sm text-gray-500 mt-1">Manage your routine and assigned tasks</p>
                 </div>
                 {user && (
-                    <Badge variant="outline" className="px-3 py-1 bg-white shadow-sm border-primary-200 text-primary-700 font-medium">
+                    <Badge variant="purple" className="px-3 py-1 bg-white shadow-sm border-primary-100 text-primary-700 font-medium">
                         📍 {user.department} Department
                     </Badge>
                 )}
@@ -219,27 +219,27 @@ export default function FacultyDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 gap-4">
-                                <a
+                                <Link
                                     href="/faculty/tasks"
                                     className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform">📋</span>
                                     <span className="font-semibold text-blue-700">View My Tasks</span>
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/faculty/leaves"
                                     className="flex items-center gap-3 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors group"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform">📅</span>
                                     <span className="font-semibold text-indigo-700">Request Leave</span>
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/faculty/timetable"
                                     className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors group"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform">🕒</span>
                                     <span className="font-semibold text-purple-700">View Timetable</span>
-                                </a>
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>

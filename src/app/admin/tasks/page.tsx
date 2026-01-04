@@ -73,18 +73,20 @@ export default function AdminTasksPage() {
         className={`p-4 border rounded-xl transition-all hover:shadow-md ${overdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
           }`}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-bold text-gray-900">{task.title}</h3>
-              <Badge variant={task.status}>{task.status}</Badge>
-              <Badge variant={task.priority}>{task.priority}</Badge>
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="flex-1 w-full min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <h3 className="font-bold text-gray-900 truncate max-w-[200px] sm:max-w-none">{task.title}</h3>
+              <div className="flex gap-2 flex-shrink-0">
+                <Badge variant={task.status}>{task.status}</Badge>
+                <Badge variant={task.priority}>{task.priority}</Badge>
+              </div>
               {overdue && (
-                <span className="text-xs font-medium text-red-600">⚠️ Overdue</span>
+                <span className="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full uppercase tracking-wider">⚠️ Overdue</span>
               )}
             </div>
-            <p className="text-sm text-gray-600 mb-3">{task.description}</p>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500">
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2 sm:line-clamp-none">{task.description}</p>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2 text-[11px] text-gray-500">
               <span className="flex items-center gap-1.5">
                 <span className="text-sm">👤</span>
                 Assigned to: <strong className="text-gray-900">{task.assignedToName}</strong>
@@ -95,20 +97,20 @@ export default function AdminTasksPage() {
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="text-sm">👨‍💼</span>
-                Created by: <strong className="text-gray-900">{task.createdByName}</strong>
+                Created by: <strong className="text-gray-900 text-xs sm:text-[11px]">{task.createdByName}</strong>
               </span>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Link href={`/admin/tasks/${task.id}/edit`}>
-              <Button variant="outline" size="sm" className="h-8">
+          <div className="flex sm:flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+            <Link href={`/admin/tasks/${task.id}/edit`} className="flex-1 sm:flex-none">
+              <Button variant="outline" size="sm" className="w-full h-8 text-xs">
                 ✏️ Edit
               </Button>
             </Link>
             <Button
               variant="danger"
               size="sm"
-              className="h-8"
+              className="flex-1 sm:flex-none h-8 text-xs"
               onClick={() => handleDelete(task.id)}
             >
               🗑️ Delete
@@ -135,17 +137,18 @@ export default function AdminTasksPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col xl:flex-row gap-4">
             <div className="flex-1">
               <Input
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 sm:flex gap-2">
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-sm"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -156,7 +159,7 @@ export default function AdminTasksPage() {
               </select>
 
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-sm"
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
               >

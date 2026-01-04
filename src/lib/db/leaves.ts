@@ -64,7 +64,10 @@ export async function requestLeave(
 /**
  * Subscribe to all pending leave requests (for admins)
  */
-export function subscribeToPendingLeaves(callback: (leaves: LeaveRequest[]) => void): Unsubscribe {
+export function subscribeToPendingLeaves(
+    callback: (leaves: LeaveRequest[]) => void,
+    errorCallback?: (error: Error) => void
+): Unsubscribe {
     const q = query(
         collection(db, 'leaves'),
         where('status', '==', 'pending'),
@@ -82,8 +85,9 @@ export function subscribeToPendingLeaves(callback: (leaves: LeaveRequest[]) => v
         (error) => {
             console.error('Error in subscribeToPendingLeaves:', error);
             if (error.message.includes('requires an index')) {
-                console.error('FIREBASE INDEX ERROR: Please create the composite index in Firestore console.');
+                console.error('🔥 FIRESTORE INDEX MISSING: Pending leaves query requires an index.');
             }
+            if (errorCallback) errorCallback(error);
         }
     );
 }
@@ -91,7 +95,10 @@ export function subscribeToPendingLeaves(callback: (leaves: LeaveRequest[]) => v
 /**
  * Subscribe to all processed leave requests (for admins)
  */
-export function subscribeToProcessedLeaves(callback: (leaves: LeaveRequest[]) => void): Unsubscribe {
+export function subscribeToProcessedLeaves(
+    callback: (leaves: LeaveRequest[]) => void,
+    errorCallback?: (error: Error) => void
+): Unsubscribe {
     const q = query(
         collection(db, 'leaves'),
         where('status', '!=', 'pending'),
@@ -110,8 +117,11 @@ export function subscribeToProcessedLeaves(callback: (leaves: LeaveRequest[]) =>
         (error) => {
             console.error('Error in subscribeToProcessedLeaves:', error);
             if (error.message.includes('requires an index')) {
-                console.error('FIREBASE INDEX ERROR: Processed leaves query requires an index.');
+                // Constructing the likely index URL (this is a guess based on the pattern, but helps the user find the blue link in console)
+                console.error('🔥 FIRESTORE INDEX MISSING: Admin processed leaves query requires a composite index.');
+                console.error('Please check your browser console for the direct creation link.');
             }
+            if (errorCallback) errorCallback(error);
         }
     );
 }
@@ -121,7 +131,8 @@ export function subscribeToProcessedLeaves(callback: (leaves: LeaveRequest[]) =>
  */
 export function subscribeToFacultyLeaves(
     facultyUid: string,
-    callback: (leaves: LeaveRequest[]) => void
+    callback: (leaves: LeaveRequest[]) => void,
+    errorCallback?: (error: Error) => void
 ): Unsubscribe {
     const q = query(
         collection(db, 'leaves'),
@@ -140,8 +151,10 @@ export function subscribeToFacultyLeaves(
         (error) => {
             console.error('Error in subscribeToFacultyLeaves:', error);
             if (error.message.includes('requires an index')) {
-                console.error('FIREBASE INDEX ERROR: Please create the composite index in Firestore console.');
+                console.error('🔥 FIRESTORE INDEX MISSING: Faculty leave history requires a composite index.');
+                console.error('Please check your browser console for the direct creation link.');
             }
+            if (errorCallback) errorCallback(error);
         }
     );
 }
