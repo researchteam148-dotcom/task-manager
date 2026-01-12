@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Load environment variables
-const dotenv = require('dotenv');
+// Load environment variables
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const serviceAccount = {
