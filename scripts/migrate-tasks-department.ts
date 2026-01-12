@@ -1,6 +1,6 @@
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import * asdc from 'dotenv';
+import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Load environment variables
