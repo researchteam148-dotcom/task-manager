@@ -5,10 +5,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     label?: string;
     error?: string;
     options: { value: string; label: string }[];
+    placeholder?: string;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-    ({ label, error, options, className, ...props }, ref) => {
+    ({ label, error, options, placeholder, className, ...props }, ref) => {
         const selectId = props.id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
         return (
@@ -35,6 +36,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                     )}
                     {...props}
                 >
+                    {placeholder && (
+                        <option value="" disabled>
+                            {placeholder}
+                        </option>
+                    )}
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
