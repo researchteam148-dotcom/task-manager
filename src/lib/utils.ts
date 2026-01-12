@@ -13,19 +13,32 @@ export function cn(...inputs: ClassValue[]) {
  * Format a Firestore Timestamp to a readable date string
  */
 export function formatDate(date: Date | { toDate: () => Date } | string): string {
-    if (!date) return '';
+    try {
+        if (!date) return '';
 
-    const dateObj = typeof date === 'string'
-        ? new Date(date)
-        : date instanceof Date
-            ? date
-            : date.toDate();
+        let dateObj: Date;
 
-    return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    }).format(dateObj);
+        if (typeof date === 'string') {
+            dateObj = new Date(date);
+        } else if (date instanceof Date) {
+            dateObj = date;
+        } else if (typeof (date as any).toDate === 'function') {
+            dateObj = (date as any).toDate();
+        } else if ((date as any).seconds) {
+            // Handle serialized Timestamp
+            dateObj = new Date((date as any).seconds * 1000);
+        } else {
+            return '';
+        }
+
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        }).format(dateObj);
+    } catch (e) {
+        return 'Invalid Date';
+    }
 }
 
 /**
@@ -93,13 +106,27 @@ export function validateEmail(email: string): boolean {
  * Check if a date is in the past (overdue)
  */
 export function isOverdue(deadline: Date | { toDate: () => Date } | string): boolean {
-    const deadlineDate = typeof deadline === 'string'
-        ? new Date(deadline)
-        : deadline instanceof Date
-            ? deadline
-            : deadline.toDate();
+    try {
+        if (!deadline) return false;
 
-    return deadlineDate < new Date();
+        let deadlineDate: Date;
+
+        if (typeof deadline === 'string') {
+            deadlineDate = new Date(deadline);
+        } else if (deadline instanceof Date) {
+            deadlineDate = deadline;
+        } else if (typeof (deadline as any).toDate === 'function') {
+            deadlineDate = (deadline as any).toDate();
+        } else if ((deadline as any).seconds) {
+            deadlineDate = new Date((deadline as any).seconds * 1000);
+        } else {
+            return false;
+        }
+
+        return deadlineDate < new Date();
+    } catch (e) {
+        return false;
+    }
 }
 
 /**

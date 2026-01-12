@@ -16,7 +16,7 @@ function CreateTaskForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const assignToId = searchParams.get('assignTo');
-    const { user } = useAuth();
+    const { user, isDean, isHoD } = useAuth();
     const [facultyList, setFacultyList] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -35,7 +35,14 @@ function CreateTaskForm() {
     }, []);
 
     const loadFaculty = async () => {
-        const faculty = await getAllFaculty();
+        let faculty: User[] = [];
+
+        if (isDean) {
+            faculty = await getAllFaculty();
+        } else if (isHoD && user?.department) {
+            faculty = await getAllFaculty(user.department);
+        }
+
         setFacultyList(faculty);
 
         // If assignTo parameter exists, use it, otherwise default to first faculty
@@ -64,7 +71,11 @@ function CreateTaskForm() {
                 return;
             }
 
-            const result = await createTask(formData, user.uid);
+            const result = await createTask(
+                formData,
+                user.uid,
+                isHoD ? user.department : undefined // Pass department if HoD
+            );
 
             if (result) {
                 setSuccess(true);

@@ -30,7 +30,7 @@ export default function LoginPage() {
 
             if (user) {
                 // Redirect based on role
-                if (user.role === 'admin') {
+                if (user.role === 'admin' || user.role === 'dean') {
                     router.push('/admin');
                 } else {
                     router.push('/faculty');

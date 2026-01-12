@@ -24,7 +24,8 @@ import { createNotification } from './notifications';
  */
 export async function createTask(
     taskData: TaskFormData,
-    createdBy: string
+    createdBy: string,
+    department?: string
 ): Promise<{ id: string } | null> {
     try {
         const tasksRef = collection(db, 'tasks');
@@ -37,6 +38,7 @@ export async function createTask(
             deadline: Timestamp.fromDate(new Date(taskData.deadline)),
             assignedTo: taskData.assignedTo,
             createdBy,
+            department: department || 'General', // Default to General if not provided
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
             comments: [],
@@ -336,4 +338,50 @@ export async function addTaskComment(
         console.error('Error adding comment:', error);
         return false;
     }
+}
+
+/**
+ * Subscribe to department tasks (for HoD)
+ */
+export function subscribeToDepartmentTasks(
+    department: string,
+    callback: (tasks: Task[]) => void
+): Unsubscribe {
+    const tasksRef = collection(db, 'tasks');
+    const q = query(
+        tasksRef,
+        where('department', '==', department),
+        orderBy('createdAt', 'desc')
+    );
+
+    console.log(`Subscribing to tasks for department: ${department}`);
+    return onSnapshot(
+        q,
+        async (snapshot) => {
+            console.log(`Found ${snapshot.docs.length} tasks for department: ${department}`);
+            const tasks = await Promise.all(
+                snapshot.docs.map(async (doc) => {
+                    const data = doc.data();
+                    const taskData = { ...data, id: doc.id } as Task;
+
+                    // Populate user names
+                    const assignedUser = await getUser(taskData.assignedTo);
+                    const creatorUser = await getUser(taskData.createdBy);
+
+                    if (assignedUser) taskData.assignedToName = assignedUser.name;
+                    if (creatorUser) taskData.createdByName = creatorUser.name;
+
+                    return taskData;
+                })
+            );
+
+            callback(tasks);
+        },
+        (error) => {
+            console.error('Error in subscribeToDepartmentTasks:', error);
+            if (error.message.includes('requires an index')) {
+                console.error('FIREBASE INDEX ERROR: Missing composite index for department query.');
+            }
+        }
+    );
 }

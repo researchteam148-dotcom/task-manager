@@ -21,10 +21,10 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
                 router.push('/login');
             } else if (allowedRoles && !allowedRoles.includes(user.role)) {
                 // Authenticated but not authorized, redirect to their dashboard
-                if (user.role === 'admin') {
-                    router.push('/admin');
+                if (user.role === 'admin' || user.role === 'dean') {
+                    router.replace('/admin');
                 } else {
-                    router.push('/faculty');
+                    router.replace('/faculty');
                 }
             }
         }

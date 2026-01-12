@@ -12,18 +12,50 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
+// Force the service worker to activate immediately
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
 
-    // Extract title and body from either 'notification' or 'data'
+self.addEventListener('activate', (event) => {
+    event.waitUntil(self.clients.claim());
+});
+
+messaging.onBackgroundMessage((payload) => {
+    console.log('[firebase-messaging-sw.js] Received background message:', payload);
+
     const notificationTitle = payload.notification?.title || payload.data?.title || 'New TaskFlow Alert';
     const notificationOptions = {
         body: payload.notification?.body || payload.data?.message || 'Check your dashboard for updates.',
-        tag: 'taskflow-notification', // Group notifications
+        tag: 'taskflow-notification',
         badge: '/favicon.ico',
-        // Removed broken icon path to prevent silent failures
+        requireInteraction: true, // Keep it visible until the user acts
+        data: {
+            url: self.location.origin
+        }
     };
 
     console.log('🔔 [SW] Showing notification:', notificationTitle);
     return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// Handle notification click
+self.addEventListener('notificationclick', (event) => {
+    console.log('👆 Notification clicked:', event.notification.tag);
+    event.notification.close();
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            if (clientList.length > 0) {
+                let client = clientList[0];
+                for (let i = 0; i < clientList.length; i++) {
+                    if (clientList[i].focused) {
+                        client = clientList[i];
+                    }
+                }
+                return client.focus();
+            }
+            return clients.openWindow('/');
+        })
+    );
 });

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { subscribeToAllTasks } from '@/lib/db/tasks';
+import { subscribeToAllTasks, subscribeToDepartmentTasks } from '@/lib/db/tasks';
 import { getAllFaculty } from '@/lib/db/users';
 import { Task, DashboardStats, User } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,7 @@ import { isOverdue } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 export default function AdminDashboard() {
-    const { user } = useAuth();
+    const { user, isDean, isHoD } = useAuth();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [faculty, setFaculty] = useState<User[]>([]);
     const [stats, setStats] = useState<DashboardStats>({
@@ -25,8 +25,12 @@ export default function AdminDashboard() {
     });
 
     useEffect(() => {
-        // Subscribe to tasks
-        const unsubscribeTasks = subscribeToAllTasks((updatedTasks) => {
+        if (!user) return;
+
+        // Subscribe to tasks based on role
+        let unsubscribeTasks: () => void;
+
+        const handleTasksUpdate = (updatedTasks: Task[]) => {
             setTasks(updatedTasks);
 
             const newStats: DashboardStats = {
@@ -40,13 +44,28 @@ export default function AdminDashboard() {
                 ).length,
             };
             setStats(newStats);
-        });
-
-        // Load faculty
-        const loadFaculty = async () => {
-            const facultyData = await getAllFaculty();
-            setFaculty(facultyData);
         };
+
+        if (isDean) {
+            unsubscribeTasks = subscribeToAllTasks(handleTasksUpdate);
+        } else {
+            // HoD or fallback
+            // Default to General if no department set for some reason
+            unsubscribeTasks = subscribeToDepartmentTasks(user.department || 'General', handleTasksUpdate);
+        }
+
+        // Load faculty based on role
+        const loadFaculty = async () => {
+            if (isDean) {
+                const facultyData = await getAllFaculty();
+                setFaculty(facultyData);
+            } else {
+                // HoD gets only their department
+                const facultyData = await getAllFaculty(user.department);
+                setFaculty(facultyData);
+            }
+        };
+
         loadFaculty();
 
         return () => {

@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { getAllFaculty } from '@/lib/db/users';
+import { getAllHoDs } from '@/lib/db/users';
+import { DEPARTMENTS } from '@/lib/constants';
 import { User } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Loading } from '@/components/ui/loading';
 import { Select } from '@/components/ui/select';
-import { DEPARTMENTS } from '@/lib/constants';
 
-export default function FacultyManagementPage() {
-    const { user, firebaseUser, isDean, isHoD } = useAuth();
-    const [faculty, setFaculty] = useState<User[]>([]);
+export default function ManageHoDsPage() {
+    const { user, firebaseUser } = useAuth();
+    const [hods, setHoDs] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -25,30 +25,23 @@ export default function FacultyManagementPage() {
         email: '',
         empId: '',
         department: '',
-        tempPassword: '',
+        password: '',
     });
 
-    const loadFaculty = async () => {
+    const loadHoDs = async () => {
         setIsLoading(true);
         try {
-            if (isDean) {
-                const data = await getAllFaculty();
-                setFaculty(data);
-            } else if (isHoD && user?.department) {
-                const data = await getAllFaculty(user.department);
-                setFaculty(data);
-                // Also pre-fill form
-                setFormData(prev => ({ ...prev, department: user.department }));
-            }
+            const data = await getAllHoDs();
+            setHoDs(data);
         } catch (err) {
-            console.error('Error loading faculty:', err);
+            console.error('Error loading HoDs:', err);
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        loadFaculty();
+        loadHoDs();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,36 +55,32 @@ export default function FacultyManagementPage() {
         try {
             const idToken = await firebaseUser.getIdToken();
 
-            const response = await fetch('/api/admin/create-user', {
+            const response = await fetch('/api/admin/create-hod', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${idToken}`,
                 },
                 body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                    empId: formData.empId,
-                    department: formData.department,
-                    password: formData.tempPassword,
+                    ...formData,
                 }),
             });
 
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to create faculty account');
+                throw new Error(result.error || 'Failed to create HoD account');
             }
 
-            setSuccess(`Faculty account for ${formData.name} created successfully!`);
+            setSuccess(`HoD for ${formData.department} created successfully!`);
             setFormData({
                 name: '',
                 email: '',
                 empId: '',
                 department: '',
-                tempPassword: '',
+                password: '',
             });
-            loadFaculty(); // Refresh list
+            loadHoDs(); // Refresh list
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -99,23 +88,32 @@ export default function FacultyManagementPage() {
         }
     };
 
-    if (isLoading && faculty.length === 0) {
+    if (isLoading && hods.length === 0) {
         return <Loading />;
+    }
+
+    if (user?.role !== 'dean') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in">
+                <h1 className="text-2xl font-bold text-gray-800">Access Denied</h1>
+                <p className="text-gray-600 mt-2">Only Deans can access this page.</p>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6 animate-fade-in">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">Faculty Management</h1>
-                <p className="text-gray-600 mt-1">Add and manage faculty user accounts</p>
+                <h1 className="text-3xl font-bold text-gray-900">Manage HoDs</h1>
+                <p className="text-gray-600 mt-1">Appoint Heads of Departments and manage assignments</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Add Faculty Form */}
+                {/* Add HoD Form */}
                 <Card className="lg:col-span-1 h-fit">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg">
-                            <span>👤</span> Add New Faculty
+                            <span>👔</span> Appoint New HoD
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -133,14 +131,14 @@ export default function FacultyManagementPage() {
 
                             <Input
                                 label="Full Name"
-                                placeholder="e.g. Dr. John Doe"
+                                placeholder="e.g. Dr. Alice Wand"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 required
                             />
                             <Input
                                 label="Employee ID"
-                                placeholder="e.g. EMP123"
+                                placeholder="e.g. HOD-CS-01"
                                 value={formData.empId}
                                 onChange={(e) => setFormData({ ...formData, empId: e.target.value })}
                                 required
@@ -148,7 +146,7 @@ export default function FacultyManagementPage() {
                             <Input
                                 label="Email Address"
                                 type="email"
-                                placeholder="john.doe@college.edu"
+                                placeholder="alice.wand@college.edu"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 required
@@ -161,21 +159,19 @@ export default function FacultyManagementPage() {
                                 value={formData.department}
                                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                                 required
-                                disabled={isHoD} // HoD can only add to their department
                             />
+                            <p className="text-[10px] text-gray-500 italic -mt-2 mb-2">
+                                * Only one HoD per department allowed.
+                            </p>
 
                             <Input
                                 label="Temporary Password"
                                 type="text"
                                 placeholder="Minimum 6 characters"
-                                value={formData.tempPassword}
-                                onChange={(e) => setFormData({ ...formData, tempPassword: e.target.value })}
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 required
                             />
-
-                            <p className="text-[10px] text-gray-500 italic">
-                                * The faculty member will be required to change this password on their first login.
-                            </p>
 
                             <Button
                                 type="submit"
@@ -183,16 +179,16 @@ export default function FacultyManagementPage() {
                                 isLoading={isSubmitting}
                                 variant="primary"
                             >
-                                Create Account
+                                Appoint HoD
                             </Button>
                         </form>
                     </CardContent>
                 </Card>
 
-                {/* Faculty List */}
+                {/* HoD List */}
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle className="text-lg">Existing Faculty Members</CardTitle>
+                        <CardTitle className="text-lg">Current Heads of Departments</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="overflow-x-auto">
@@ -206,7 +202,7 @@ export default function FacultyManagementPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {faculty.map((user) => (
+                                    {hods.map((user) => (
                                         <tr key={user.uid} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                             <td className="py-4 px-2">
                                                 <div className="font-semibold text-gray-900">{user.name}</div>
@@ -216,21 +212,17 @@ export default function FacultyManagementPage() {
                                                 {user.empId}
                                             </td>
                                             <td className="py-4 px-2 text-sm text-gray-600">
-                                                {user.department}
+                                                <Badge variant="High" className="rounded-md">{user.department}</Badge>
                                             </td>
                                             <td className="py-4 px-2 text-right">
-                                                {user.requiresPasswordChange ? (
-                                                    <Badge variant="Pending" className="text-[10px]">Pending PW Change</Badge>
-                                                ) : (
-                                                    <Badge variant="success" className="text-[10px]">Active</Badge>
-                                                )}
+                                                <Badge variant="success" className="text-[10px]">Active</Badge>
                                             </td>
                                         </tr>
                                     ))}
-                                    {faculty.length === 0 && (
+                                    {hods.length === 0 && (
                                         <tr>
                                             <td colSpan={4} className="py-8 text-center text-gray-500">
-                                                No faculty members found.
+                                                No HoDs appointed yet.
                                             </td>
                                         </tr>
                                     )}

@@ -6,17 +6,7 @@ import { updateUser } from '@/lib/db/users';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-const DEPARTMENTS = [
-    'Administration',
-    'Computer Science',
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Engineering',
-    'Humanities',
-    'Arts'
-];
+import { DEPARTMENTS } from '@/lib/constants';
 
 export default function ProfilePage() {
     const { user } = useAuth();
@@ -58,6 +48,12 @@ export default function ProfilePage() {
         }
     };
 
+    const getRoleLabel = (role: string) => {
+        if (role === 'admin') return 'Head of Department';
+        if (role === 'dean') return 'Dean';
+        return 'Faculty';
+    };
+
     if (!user) return null;
 
     return (
@@ -67,8 +63,8 @@ export default function ProfilePage() {
                     <h1 className="text-4xl font-black text-slate-900 tracking-tight">Your Profile</h1>
                     <p className="text-slate-500 mt-1">Manage your identity and platform preferences</p>
                 </div>
-                <Badge variant={user.role === 'admin' ? 'High' : 'Medium'} className="px-4 py-1 text-sm rounded-full shadow-sm">
-                    {user.role.toUpperCase()}
+                <Badge variant={user.role === 'admin' ? 'High' : user.role === 'dean' ? 'Warning' : 'Medium'} className="px-4 py-1 text-sm rounded-full shadow-sm">
+                    {getRoleLabel(user.role).toUpperCase()}
                 </Badge>
             </div>
 
@@ -103,7 +99,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="p-3 bg-white/50 rounded-xl border border-slate-100/50">
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Joined</p>
-                                    <p className="font-bold text-slate-700">{new Date(user.createdAt.seconds * 1000).toLocaleDateString()}</p>
+                                    <p className="font-bold text-slate-700">{user.createdAt?.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
@@ -137,11 +133,12 @@ export default function ProfilePage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Department</label>
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Department {user.role !== 'dean' && '(Read Only)'}</label>
                                     <select
-                                        className="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                        className="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                         value={formData.department}
                                         onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                                        disabled={true} // Strict constraint: Department is assigned by system
                                     >
                                         <option value="">Select Department</option>
                                         {DEPARTMENTS.map(dept => (
@@ -185,7 +182,7 @@ export default function ProfilePage() {
                         </form>
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

@@ -52,6 +52,15 @@ const sampleUsers = [
         empId: 'MATH001',
         password: 'faculty123',
     },
+    {
+        uid: 'dean_demo_id',
+        name: 'Dean of Faculty',
+        email: 'dean@example.com',
+        role: 'dean',
+        department: 'Administration',
+        empId: 'DEAN001',
+        password: 'dean123',
+    },
 ];
 
 const sampleTasks = [

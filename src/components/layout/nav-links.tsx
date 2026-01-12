@@ -33,7 +33,12 @@ export function NavLinks({ onItemClick, className }: NavLinksProps) {
         { href: '/profile', label: 'My Profile', icon: '👤' },
     ];
 
-    const links = user.role === 'admin' ? adminLinks : facultyLinks;
+    const links = (user.role === 'admin' || user.role === 'dean') ? adminLinks : facultyLinks;
+
+    // Add Manage HoDs for Deans
+    if (user.role === 'dean') {
+        links.push({ href: '/admin/hods', label: 'Manage HoDs', icon: '👔' });
+    }
 
     return (
         <nav className={cn("space-y-1", className)}>

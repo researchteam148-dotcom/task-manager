@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 // User types
-export type UserRole = 'admin' | 'faculty';
+export type UserRole = 'admin' | 'faculty' | 'dean';
 
 export interface User {
     uid: string;
@@ -31,6 +31,7 @@ export interface Task {
     assignedToName?: string; // populated for display
     createdBy: string; // admin uid
     createdByName?: string; // populated for display
+    department?: string; // For HoD scoping
     createdAt: Timestamp;
     updatedAt: Timestamp;
     comments?: TaskComment[];

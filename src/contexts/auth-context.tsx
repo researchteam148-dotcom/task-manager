@@ -12,6 +12,8 @@ interface AuthContextType {
     loading: boolean;
     isAdmin: boolean;
     isFaculty: boolean;
+    isDean: boolean;
+    isHoD: boolean;
     requiresPasswordChange: boolean;
 }
 
@@ -21,6 +23,8 @@ const AuthContext = createContext<AuthContextType>({
     loading: true,
     isAdmin: false,
     isFaculty: false,
+    isDean: false,
+    isHoD: false,
     requiresPasswordChange: false,
 });
 
@@ -62,8 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         firebaseUser,
         loading,
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role === 'admin' || user?.role === 'dean', // Both can access admin routes
         isFaculty: user?.role === 'faculty',
+        isDean: user?.role === 'dean',
+        isHoD: user?.role === 'admin', // Only original admins are HoDs
         requiresPasswordChange: !!user?.requiresPasswordChange,
     };
 

@@ -14,10 +14,13 @@ export default function Home() {
     useEffect(() => {
         if (!loading && user) {
             // Smart redirect if already logged in
-            if (user.role === 'admin') {
+            console.log('Smart Redirect - Current User Role:', user.role);
+            if (user.role === 'admin' || user.role === 'dean') {
                 router.push('/admin');
-            } else {
+            } else if (user.role === 'faculty') {
                 router.push('/faculty');
+            } else {
+                console.warn('Unknown user role:', user.role);
             }
         }
     }, [user, loading, router]);

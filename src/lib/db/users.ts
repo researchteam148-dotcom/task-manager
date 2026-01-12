@@ -67,12 +67,22 @@ export async function updateUser(uid: string, data: Partial<User>): Promise<void
 }
 
 /**
- * Get all faculty members
+ * Get all faculty members (optionally filtered by department)
  */
-export async function getAllFaculty(): Promise<User[]> {
+export async function getAllFaculty(department?: string): Promise<User[]> {
     try {
         const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('role', '==', 'faculty'));
+        let q;
+
+        if (department) {
+            q = query(usersRef,
+                where('role', '==', 'faculty'),
+                where('department', '==', department)
+            );
+        } else {
+            q = query(usersRef, where('role', '==', 'faculty'));
+        }
+
         const querySnapshot = await getDocs(q);
 
         return querySnapshot.docs.map(doc => ({
@@ -118,6 +128,50 @@ export async function getAllUsers(): Promise<User[]> {
         })) as User[];
     } catch (error) {
         console.error('Error getting all users:', error);
+        return [];
+    }
+}
+
+/**
+ * Get HoD for a specific department
+ */
+export async function getHoDByDepartment(department: string): Promise<User | null> {
+    try {
+        const usersRef = collection(db, 'users');
+        const q = query(
+            usersRef,
+            where('role', '==', 'admin'),
+            where('department', '==', department)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return null;
+        }
+
+        const doc = querySnapshot.docs[0];
+        return { ...doc.data(), uid: doc.id } as User;
+    } catch (error) {
+        console.error('Error getting HoD by department:', error);
+        return null;
+    }
+}
+
+/**
+ * Get all HoDs (Admins)
+ */
+export async function getAllHoDs(): Promise<User[]> {
+    try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('role', '==', 'admin'));
+        const querySnapshot = await getDocs(q);
+
+        return querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            uid: doc.id,
+        })) as User[];
+    } catch (error) {
+        console.error('Error getting all HoDs:', error);
         return [];
     }
 }
