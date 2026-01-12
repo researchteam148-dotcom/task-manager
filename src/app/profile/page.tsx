@@ -63,7 +63,7 @@ export default function ProfilePage() {
                     <h1 className="text-4xl font-black text-slate-900 tracking-tight">Your Profile</h1>
                     <p className="text-slate-500 mt-1">Manage your identity and platform preferences</p>
                 </div>
-                <Badge variant={user.role === 'admin' ? 'High' : user.role === 'dean' ? 'Warning' : 'Medium'} className="px-4 py-1 text-sm rounded-full shadow-sm">
+                <Badge variant={user.role === 'admin' ? 'High' : user.role === 'dean' ? 'purple' : 'Medium'} className="px-4 py-1 text-sm rounded-full shadow-sm">
                     {getRoleLabel(user.role).toUpperCase()}
                 </Badge>
             </div>
