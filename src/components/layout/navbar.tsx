@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { signOut } from '@/lib/auth';
@@ -41,9 +42,14 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
                         </button>
 
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg shadow-primary-200">
-                                <span className="text-white text-lg font-bold">T</span>
-                            </div>
+                            <Image
+                                src="/images/aditya-logo.webp"
+                                alt="Aditya University"
+                                width={150}
+                                height={150}
+                                className="rounded-lg shadow-lg shadow-primary-200"
+                                priority
+                            />
                             <h1 className="text-lg font-black text-gray-900 tracking-tighter hidden xs:block">TaskFlow</h1>
                             <Badge variant={user.role === 'admin' ? 'default' : 'purple'} className="hidden xs:inline-flex text-[10px] px-2 py-0">
                                 {user.role.toUpperCase()}

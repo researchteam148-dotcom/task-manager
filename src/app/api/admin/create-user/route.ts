@@ -15,8 +15,13 @@ export async function POST(request: NextRequest) {
 
         // Check role in Firestore
         const adminDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
-        if (!adminDoc.exists || adminDoc.data()?.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+        const userData = adminDoc.data();
+        
+        if (!adminDoc.exists || (userData?.role !== 'admin' && userData?.role !== 'dean')) {
+            console.error(`Unauthorized user creation attempt by ${decodedToken.email}. Role: ${userData?.role}`);
+            return NextResponse.json({ 
+                error: `Forbidden: Admin access required. Found role: ${userData?.role || 'none'}` 
+            }, { status: 403 });
         }
 
         // 2. Parse request body

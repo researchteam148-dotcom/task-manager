@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, signInWithGoogle } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,15 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 px-4">
             <div className="w-full max-w-md animate-fade-in">
                 <div className="text-center mb-8">
+                    <div className="flex justify-center mb-6">
+                        <Image
+                            src="/images/aditya-logo.webp"
+                            alt="Aditya University"
+                            width={150}
+                            height={150}
+                            priority
+                        />
+                    </div>
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">
                         Task Planner
                     </h1>
