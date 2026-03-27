@@ -13,7 +13,7 @@ import {
     Timestamp,
     Unsubscribe,
 } from 'firebase/firestore';
-import { db } from '../firebase-config';
+import { db, auth } from '../firebase-config';
 import { Task, TaskStatus, TaskFormData, TaskUpdateData } from '@/types';
 import { createAuditLog } from './audit-logs';
 import { getUser } from './users';
@@ -62,6 +62,31 @@ export async function createTask(
             `You have been assigned a new task: ${taskData.title}`,
             docRef.id
         );
+
+        // Notify assigned faculty via Email
+        try {
+            const assignedUser = await getUser(taskData.assignedTo);
+            const creatorUser = await getUser(createdBy);
+            const token = await auth.currentUser?.getIdToken();
+
+            if (assignedUser?.email && creatorUser?.name && token) {
+                fetch('/api/email/task-assigned', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        toEmail: assignedUser.email,
+                        taskTitle: taskData.title,
+                        taskDescription: taskData.description,
+                        assignedByName: creatorUser.name
+                    })
+                }).catch(e => console.error('Failed to send assignment email', e));
+            }
+        } catch (e) {
+            console.error('Failed to prepare assignment email', e);
+        }
 
         return { id: docRef.id };
     } catch (error) {

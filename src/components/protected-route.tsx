@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-    const { user, loading } = useAuth();
+    const { user, loading, isOtpVerified } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -19,6 +19,9 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
             if (!user) {
                 // Not authenticated, redirect to login
                 router.push('/login');
+            } else if (!isOtpVerified) {
+                 // Needs OTP verification
+                 router.push('/login?verify=true');
             } else if (allowedRoles && !allowedRoles.includes(user.role)) {
                 // Authenticated but not authorized, redirect to their dashboard
                 if (user.role === 'admin' || user.role === 'dean') {
@@ -28,7 +31,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
                 }
             }
         }
-    }, [user, loading, allowedRoles, router]);
+    }, [user, loading, isOtpVerified, allowedRoles, router]);
 
     if (loading) {
         return (

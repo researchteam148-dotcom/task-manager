@@ -15,6 +15,8 @@ interface AuthContextType {
     isDean: boolean;
     isHoD: boolean;
     requiresPasswordChange: boolean;
+    isOtpVerified: boolean;
+    setOtpVerified: (status: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,12 +28,31 @@ const AuthContext = createContext<AuthContextType>({
     isDean: false,
     isHoD: false,
     requiresPasswordChange: false,
+    isOtpVerified: false,
+    setOtpVerified: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isOtpVerified, setIsOtpVerified] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('otpVerified') === 'true';
+        }
+        return false;
+    });
+
+    const setOtpVerified = (status: boolean) => {
+        setIsOtpVerified(status);
+        if (typeof window !== 'undefined') {
+            if (status) {
+                localStorage.setItem('otpVerified', 'true');
+            } else {
+                localStorage.removeItem('otpVerified');
+            }
+        }
+    };
 
     useEffect(() => {
         let unsubscribeUser: (() => void) | null = null;
@@ -52,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 unsubscribeUser = null;
                 setUser(null);
                 setFirebaseUser(null);
+                setOtpVerified(false); // Reset OTP on sign out
                 setLoading(false);
             }
         });
@@ -71,6 +93,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isDean: user?.role === 'dean',
         isHoD: user?.role === 'admin', // Only original admins are HoDs
         requiresPasswordChange: !!user?.requiresPasswordChange,
+        isOtpVerified,
+        setOtpVerified,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
