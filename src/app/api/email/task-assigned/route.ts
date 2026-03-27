@@ -3,10 +3,8 @@ import { Resend } from 'resend';
 import { adminAuth } from '@/lib/firebase-admin';
 import { getTaskAssignmentEmailHtml } from '@/lib/email-templates';
 
-// Initialize the Resend client with API key from env
-const resend = new Resend(process.env.RESEND_API_KEY!);
-
 export async function POST(request: NextRequest) {
+    const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
     try {
         // Verify Authorization so arbitrary users can't spam emails
         const authHeader = request.headers.get('Authorization');
