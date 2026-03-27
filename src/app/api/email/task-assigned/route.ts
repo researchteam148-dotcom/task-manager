@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { adminAuth } from '@/lib/firebase-admin';
-import { getTaskAssignmentEmailHtml } from '@/lib/email-templates';
+import { getTaskAssignmentEmailHtml, getTaskUpdateEmailHtml } from '@/lib/email-templates';
 
 export async function POST(request: NextRequest) {
     const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
