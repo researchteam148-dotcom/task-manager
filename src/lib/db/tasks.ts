@@ -145,6 +145,12 @@ export async function updateTask(
             });
         }
 
+        // Notify assigned faculty
+        await createNotification(
+            currentTask.assignedTo,
+            'task_status',
+            'Task Updated',
+            `A task assigned to you has been updated: ${currentTask.title}`,
             taskId
         );
 
