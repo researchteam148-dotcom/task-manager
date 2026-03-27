@@ -26,6 +26,33 @@ export function getTaskAssignmentEmailHtml(taskTitle: string, taskDescription: s
     `;
 }
 
+export function getTaskUpdateEmailHtml(taskTitle: string, updateDetails: string, updatedBy: string) {
+    return `
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #4F46E5;">TaskFlow</h2>
+            </div>
+            <div style="background-color: #f9fafb; padding: 24px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <h3 style="margin-top: 0; color: #111827;">Task Updated</h3>
+                <p>Hello,</p>
+                <p>A task assigned to you has been updated by <strong>${updatedBy}</strong>.</p>
+                
+                <div style="background-color: #ffffff; padding: 16px; border-radius: 6px; border: 1px solid #e5e7eb; margin: 20px 0;">
+                    <p style="margin: 0;"><strong>Task:</strong> ${taskTitle}</p>
+                    <p style="margin: 8px 0 0 0;"><strong>Changes:</strong></p>
+                    <p style="background-color: #fef9c3; padding: 12px; border-radius: 4px; font-size: 14px; margin-top: 4px; color: #854d0e;">${updateDetails}</p>
+                </div>
+                
+                <p>Please check the TaskFlow dashboard for the latest information.</p>
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; margin-top: 10px;">View Task Details</a>
+            </div>
+            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #6b7280;">
+                <p>&copy; ${new Date().getFullYear()} Aditya University. All rights reserved.</p>
+            </div>
+        </div>
+    `;
+}
+
 export function getOtpEmailHtml(otp: string) {
     return `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">

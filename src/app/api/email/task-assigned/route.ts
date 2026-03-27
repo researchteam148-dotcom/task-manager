@@ -15,18 +15,35 @@ export async function POST(request: NextRequest) {
         const idToken = authHeader.split('Bearer ')[1];
         await adminAuth.verifyIdToken(idToken); // Ensures the user is logged into Firebase
 
-        const { toEmail, taskTitle, taskDescription, assignedByName } = await request.json();
+        const { 
+            toEmail, 
+            taskTitle, 
+            taskDescription, 
+            updateDetails, 
+            assignedByName, 
+            updatedByName, 
+            type = 'assignment' 
+        } = await request.json();
 
-        if (!toEmail || !taskTitle || !taskDescription || !assignedByName) {
+        if (!toEmail || !taskTitle) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        let subject, html;
+        if (type === 'update') {
+            subject = `Task Updated: ${taskTitle}`;
+            html = getTaskUpdateEmailHtml(taskTitle, updateDetails || 'The task details have been modified.', updatedByName || 'An administrator');
+        } else {
+            subject = `New Task Assigned: ${taskTitle}`;
+            html = getTaskAssignmentEmailHtml(taskTitle, taskDescription || '', assignedByName || 'An administrator');
         }
 
         // Send Email via Resend
         const { data, error } = await resend.emails.send({
             from: 'TaskFlow <noreply@promptify.fun>', // Using verified domain
             to: [toEmail],
-            subject: `New Task Assigned: ${taskTitle}`,
-            html: getTaskAssignmentEmailHtml(taskTitle, taskDescription, assignedByName),
+            subject,
+            html,
         });
 
         if (error) {

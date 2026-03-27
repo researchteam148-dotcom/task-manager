@@ -145,14 +145,34 @@ export async function updateTask(
             });
         }
 
-        // Notify assigned faculty of update
-        await createNotification(
-            currentTask.assignedTo,
-            'task_status',
-            'Task Updated',
-            `A task assigned to you has been updated: ${currentTask.title}`,
             taskId
         );
+
+        // Notify assigned faculty via Email
+        try {
+            const assignedUser = await getUser(currentTask.assignedTo);
+            const creatorUser = await getUser(updatedBy);
+            const token = await auth.currentUser?.getIdToken();
+
+            if (assignedUser?.email && creatorUser?.name && token) {
+                fetch('/api/email/task-assigned', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        toEmail: assignedUser.email,
+                        taskTitle: currentTask.title,
+                        updateDetails: details,
+                        updatedByName: creatorUser.name,
+                        type: 'update'
+                    })
+                }).catch(e => console.error('Failed to send update email', e));
+            }
+        } catch (e) {
+            console.error('Failed to prepare update email', e);
+        }
 
         return true;
     } catch (error) {
